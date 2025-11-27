@@ -1,6 +1,24 @@
 import Head from 'next/head';
+import { useAuth } from '../context/AuthContext';
+import { GoogleAuthProvider, signInWithPopup, signOut } from 'firebase/auth';
+import { auth } from '../lib/firebase';
 
 export default function Home() {
+  const { user } = useAuth();
+
+  const loginWithGoogle = async () => {
+    const provider = new GoogleAuthProvider();
+    try {
+      await signInWithPopup(auth, provider);
+    } catch (error) {
+      console.error("Googleログインに失敗しました", error);
+    }
+  };
+
+  const logout = async () => {
+    await signOut(auth);
+  };
+
   return (
     <div>
       <Head>
@@ -10,14 +28,26 @@ export default function Home() {
       </Head>
 
       <main>
-        <h1>
-          お兄ちゃんの{' '}
-          <a href="https://nextjs.org">Oogiri Platform!</a>
-        </h1>
+        <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem' }}>
+          <h1>
+            お兄ちゃんの{' '}
+            <a href="https://nextjs.org">Oogiri Platform!</a>
+          </h1>
+          {user ? (
+            <div>
+              <span>{user.displayName}さん、ようこそ！</span>
+              <button onClick={logout} style={{ marginLeft: '1rem' }}>ログアウト</button>
+            </div>
+          ) : (
+            <button onClick={loginWithGoogle}>Googleでログイン</button>
+          )}
+        </header>
 
         <p>
-          ここはNext.jsで動いてるぜ。Vercelへのデプロイ準備完了！
+          ここはNext.jsで動いてるぜ。Vercelへのデプロイ準備完了？！
         </p>
+
+        {/* ここに大喜利プラットフォームのメインコンテンツを実装していきます */}
       </main>
     </div>
   );
